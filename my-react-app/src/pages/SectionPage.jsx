@@ -10,12 +10,11 @@ const SectionPage = () => {
   const pageRef = useRef(null);
 
   useEffect(() => {
-    if (!section) return;
-    
+    window.scrollTo(0, 0);
+    if (!section || !pageRef.current) return;
+
     const elements = pageRef.current.querySelectorAll('.stagger-enter');
-    
     anime.set(elements, { opacity: 0, translateY: 30 });
-    
     anime({
       targets: elements,
       opacity: [0, 1],
@@ -29,31 +28,32 @@ const SectionPage = () => {
   if (!section) {
     return (
       <main className="section-page-not-found">
-        <div className="section-page-content">
-          <h1>Página no encontrada</h1>
-          <p>Lo sentimos, esta sección no existe.</p>
-          <Link to="/" className="btn-back">
-            ← Volver al Inicio
-          </Link>
-        </div>
+        <h1>Página no encontrada</h1>
+        <p>Lo sentimos, esta sección no existe.</p>
+        <Link to="/" className="btn-back">← Volver al Inicio</Link>
       </main>
     );
   }
 
   return (
     <main className="section-page" ref={pageRef}>
+      {/* Hero */}
       <div className="section-page-hero" style={{ background: section.gradient }}>
         <h1 className="stagger-enter">{section.name}</h1>
         <p className="stagger-enter">{section.description}</p>
+        {section.requiresAccess && (
+          <span className="access-badge stagger-enter">🔐 Acceso Restringido</span>
+        )}
       </div>
 
+      {/* Body */}
       <div className="section-page-container">
         <div className="section-page-body">
           <div className="section-text stagger-enter">
             <h2>Detalles y Especificaciones</h2>
             <p>
               Explora en profundidad lo que <strong>{section.name}</strong> tiene para ofrecer.
-              Hemos diseñado esta experiencia con un enfoque meticuloso en la funcionalidad y 
+              Hemos diseñado esta experiencia con un enfoque meticuloso en la funcionalidad y
               la estética premium.
             </p>
 
@@ -61,11 +61,10 @@ const SectionPage = () => {
               <div className="detail-card">
                 <h3>Visión</h3>
                 <p>
-                  Crear un ecosistema digital sin fricciones que permita a los usuarios
-                  interactuar de forma intuitiva.
+                  Crear un ecosistema sin fricciones que permita a los usuarios
+                  interactuar de forma intuitiva y segura.
                 </p>
               </div>
-
               <div className="detail-card">
                 <h3>Características</h3>
                 <ul>
@@ -80,7 +79,7 @@ const SectionPage = () => {
 
           <div className="section-image-large stagger-enter">
             <img
-              src={`https://placehold.co/1000x600/1A1A1A/FFFFFF?text=${encodeURIComponent(section.name)}&font=outfit`}
+              src={`https://placehold.co/1000x600/141416/FFFFFF?text=${encodeURIComponent(section.name)}&font=outfit`}
               alt={section.name}
               loading="lazy"
             />
@@ -88,7 +87,11 @@ const SectionPage = () => {
         </div>
 
         <div className="section-footer stagger-enter">
-          <Link to="/" className="btn-back" style={{ borderColor: section.color, color: section.color }}>
+          <Link
+            to="/"
+            className="btn-back"
+            style={{ borderColor: section.color, color: section.color }}
+          >
             ← Volver al Inicio
           </Link>
         </div>

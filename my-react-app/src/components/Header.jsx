@@ -1,12 +1,13 @@
 import React, { useEffect, useRef } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import anime from 'animejs';
 import { SECTIONS } from '../constants/sections';
 import './Header.css';
 
 const Header = () => {
   const location = useLocation();
-  const navRef = useRef(null);
+  const navigate = useNavigate();
+  const isHome = location.pathname === '/';
 
   useEffect(() => {
     anime({
@@ -18,51 +19,53 @@ const Header = () => {
     });
   }, []);
 
-  const handleMouseEnter = (e) => {
-    anime({
-      targets: e.target,
-      scale: 1.05,
-      color: '#FFF',
-      duration: 300,
-      easing: 'easeOutQuad',
-    });
+  const handleNavClick = (section) => {
+    if (!isHome) {
+      // Navigate home first, then scroll
+      navigate('/');
+      setTimeout(() => {
+        const el = document.getElementById(`section-${section.id}`);
+        if (el) el.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
+    } else {
+      const el = document.getElementById(`section-${section.id}`);
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
+    }
   };
 
-  const handleMouseLeave = (e, isActive) => {
-    anime({
-      targets: e.target,
-      scale: 1,
-      color: isActive ? '#FFF' : '#9CA3AF',
-      duration: 300,
-      easing: 'easeOutQuad',
-    });
+  const handleMouseEnter = (e) => {
+    anime({ targets: e.currentTarget, scale: 1.05, duration: 250, easing: 'easeOutQuad' });
+  };
+
+  const handleMouseLeave = (e) => {
+    anime({ targets: e.currentTarget, scale: 1, duration: 250, easing: 'easeOutQuad' });
   };
 
   return (
     <header className="navbar">
       <div className="navbar-container">
         <div className="navbar-logo">
-          <Link to="/">
+          <button
+            className="logo-btn"
+            onClick={() => navigate('/')}
+            aria-label="Ir al inicio"
+          >
             <h1>Pozole</h1>
-          </Link>
+          </button>
         </div>
 
-        <nav className="navbar-nav" ref={navRef}>
-          {SECTIONS.map((section) => {
-            const isActive = location.pathname === `/${section.path}`;
-            return (
-              <Link
-                key={section.id}
-                to={`/${section.path}`}
-                className={`nav-link ${isActive ? 'active' : ''}`}
-                onMouseEnter={handleMouseEnter}
-                onMouseLeave={(e) => handleMouseLeave(e, isActive)}
-                style={{ color: isActive ? '#FFF' : '#9CA3AF' }}
-              >
-                {section.name}
-              </Link>
-            );
-          })}
+        <nav className="navbar-nav">
+          {SECTIONS.map((section) => (
+            <button
+              key={section.id}
+              className="nav-link"
+              onClick={() => handleNavClick(section)}
+              onMouseEnter={handleMouseEnter}
+              onMouseLeave={handleMouseLeave}
+            >
+              {section.name}
+            </button>
+          ))}
         </nav>
       </div>
     </header>
